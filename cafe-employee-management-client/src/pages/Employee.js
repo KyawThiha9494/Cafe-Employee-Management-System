@@ -5,12 +5,15 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { Button, Box, Container, Typography } from '@mui/material';
 import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import { useRouter } from '@tanstack/react-router';
+
 
 const Employee = () => {
 
 
     const [openDialog, setOpenDialog] = useState(false);
     const [employeeToDelete, setEmployeeToDelete] = useState(null);
+    const router = useRouter(); 
 
     const employees = [
         {
@@ -54,6 +57,8 @@ const Employee = () => {
     
     const handleAddNewEmployee = () => {
         console.log('Add New Employee');
+        router.navigate({ to: '/employee-form' });
+            
     };
 
     const handleConfirmDelete = () => {
