@@ -2,10 +2,11 @@ import React, {useState} from "react";
 import { AgGridReact } from "ag-grid-react";
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import { Button, Box, Container, Typography } from '@mui/material';
+import { CircularProgress, Button, Box, Container, Typography } from '@mui/material';
 import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useRouter } from '@tanstack/react-router';
+import { useEmployees } from "../hooks/useEmployees";
 
 
 const Employee = () => {
@@ -13,9 +14,10 @@ const Employee = () => {
 
     const [openDialog, setOpenDialog] = useState(false);
     const [employeeToDelete, setEmployeeToDelete] = useState(null);
+    const { data: employees, isLoading, isError } = useEmployees();
     const router = useRouter(); 
 
-    const employees = [
+    /*const employees = [
         {
             id: 1,
             name: 'John Doe',
@@ -44,9 +46,9 @@ const Employee = () => {
             cafeName: 'Espresso Express',
         }
     ];
-    
+     */
     const handleEdit = (employee) => {
-        console.log('Edit employee:', employee);
+        router.navigate({ to: `/employee-form/${employee.id}` });                
     };
     
     const handleDelete = (employeeId) => {
@@ -57,7 +59,7 @@ const Employee = () => {
     
     const handleAddNewEmployee = () => {
         console.log('Add New Employee');
-        router.navigate({ to: '/employee-form' });
+        router.navigate({ to: '/employee-form/create' });
             
     };
 
@@ -71,15 +73,18 @@ const Employee = () => {
         setEmployeeToDelete(null);
     };
 
+    const handleBack = () => {
+        router.navigate({ to: '/' });
+      };
 
     const columnDefs = [
         { headerName: 'Employee ID', field: 'id', sortable: true, filter: true },
         { headerName: 'Name', field: 'name', sortable: true, filter: true },
         { headerName: 'Gender', field: 'gender', sortable: true, filter: true },
-        { headerName: 'Email Address', field: 'email', sortable: true, filter: true },
-        { headerName: 'Phone Number', field: 'phone', sortable: true, filter: true },
+        { headerName: 'Email Address', field: 'emailAddress', sortable: true, filter: true },
+        { headerName: 'Phone Number', field: 'phoneNumber', sortable: true, filter: true },
         { headerName: 'Days Worked', field: 'daysWorked', sortable: true, filter: true },
-        { headerName: 'Café Name', field: 'cafeName', sortable: true, filter: true },
+        { headerName: 'Café Name', field: 'cafe', sortable: true, filter: true },
         {
             headerName: 'Actions',
             cellRenderer: (params) => (
@@ -104,6 +109,9 @@ const Employee = () => {
         },
     ];
 
+    if (isLoading) return <CircularProgress />; 
+    if (isError) return <Typography color="error">Error fetching data</Typography>;
+
     return (
         <Container>
             <Typography variant="h4" gutterBottom>Employee Management</Typography>
@@ -119,7 +127,7 @@ const Employee = () => {
             </Button>
           </Box>
            
-            <div className="ag-theme-alpine" style={{ height: 400, width: '100%' }}>
+            <div className="ag-theme-alpine" style={{ height: 400, width: '100%',marginBottom: '20px'}}>
                 <AgGridReact
                     rowData={employees}
                     columnDefs={columnDefs}
@@ -127,6 +135,10 @@ const Employee = () => {
                     paginationPageSize={10}
                 />
             </div>
+
+            <button type="button" onClick={handleBack} className="button button-submit">
+              ~ Back to Welcome Page
+            </button>
 
             <Dialog
                 open={openDialog}

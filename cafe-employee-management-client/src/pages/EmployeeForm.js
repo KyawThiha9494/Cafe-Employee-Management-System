@@ -1,8 +1,14 @@
-import React, { useState, useEffect }  from 'react';
-import { useRouter } from '@tanstack/react-router';
+import React, { useState, useEffect } from 'react';
+import { useRouter, useParams, useNavigate } from '@tanstack/react-router';
 
+const EmployeeForm = () => {
 
-const EmployeeForm = ({ existingEmployee }) => {
+  const {id} = useParams({ from: '/employee-form/$id'} );
+
+  //const navigate = useNavigate();
+
+  const router = useRouter(); 
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -10,30 +16,53 @@ const EmployeeForm = ({ existingEmployee }) => {
     gender: '',
     assignedCafe: '',
   });
-
   const [errors, setErrors] = useState({});
-  const router = useRouter(); 
 
   useEffect(() => {
-    if (existingEmployee) {
-      setFormData(existingEmployee);
+    if (id !== 'create') {
+      // Fetch employee data based on employeeId
+      console.log('Fetching data for employeeId:', id);
+      // Example employee data fetching logic
+      const employeeData = {
+        id: id,
+        name: 'John Doe',
+        email: 'john.doe@example.com',
+        phoneNumber: '123-456-7890',
+        gender: 'male',
+        assignedCafe: 'Cafe1',
+      };
+      setFormData(employeeData);
+    } else {
+      console.log('No employeeId found in URL');
+      // Clear form data if no employeeId
+      setFormData({
+        name: '',
+        email: '',
+        phoneNumber: '',
+        gender: '',
+        assignedCafe: '',
+      });
     }
-  }, [existingEmployee]);
+  }, [id]);
 
   const validate = () => {
     let newErrors = {};
     if (!formData.name || formData.name.length < 6 || formData.name.length > 10) {
-      newErrors.name = 'Name must be between 6 and 10 characters';
+      newErrors.name = '* Name must be between 6 and 10 characters';
     }
     if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Invalid email address';
+      newErrors.email = '* Invalid email address';
     }
     if (!formData.phoneNumber || !/^[89]\d{7}$/.test(formData.phoneNumber)) {
-      newErrors.phoneNumber = 'Phone number must start with 8 or 9 and have 8 digits';
+      newErrors.phoneNumber = '* Phone number must start with 8 or 9 and have 8 digits';
     }
     if (!formData.gender) {
-      newErrors.gender = 'Gender is required';
+      newErrors.gender = '* Gender is required';
     }
+    if (!formData.assignedCafe) {
+      newErrors.assignedCafe = '* Please select a café';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -47,96 +76,97 @@ const EmployeeForm = ({ existingEmployee }) => {
     e.preventDefault();
     if (validate()) {
       console.log('Submitting form data:', formData);
-      router.navigate({ to: '/employee' });
+      //navigate('/employee');
+      router.navigate({ to: `/employee` });   
     }
   };
 
   const handleCancel = () => {
-    router.navigate({ to: '/employee' });
+    //navigate('/employee');
+    router.navigate({ to: `/employee` });   
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '0 auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px' }}>
-      <h2>{existingEmployee ? 'Edit Employee' : 'Add Employee'}</h2>
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '10px' }}>
-          <label>Name:</label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            style={{ width: '100%', padding: '8px', marginTop: '4px' }}
-          />
-          {errors.name && <p style={{ color: 'red' }}>{errors.name}</p>}
-        </div>
-
-        <div style={{ marginBottom: '10px' }}>
-          <label>Email:</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            style={{ width: '100%', padding: '8px', marginTop: '4px' }}
-          />
-          {errors.email && <p style={{ color: 'red' }}>{errors.email}</p>}
-        </div>
-
-        <div style={{ marginBottom: '10px' }}>
-          <label>Phone Number:</label>
-          <input
-            type="text"
-            name="phoneNumber"
-            value={formData.phoneNumber}
-            onChange={handleChange}
-            style={{ width: '100%', padding: '8px', marginTop: '4px' }}
-          />
-          {errors.phoneNumber && <p style={{ color: 'red' }}>{errors.phoneNumber}</p>}
-        </div>
-
-        <div style={{ marginBottom: '10px' }}>
-          <label>Gender:</label>
-          <div>
+    <div className="container">
+      <div className="form-container">
+        <h2>{id !== 'create' ? 'Edit Employee' : 'Add Employee'}</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Name:</label>
             <input
-              type="radio"
-              name="gender"
-              value="male"
-              checked={formData.gender === 'male'}
+              type="text"
+              name="name"
+              value={formData.name}
               onChange={handleChange}
-            /> Male
-            <input
-              type="radio"
-              name="gender"
-              value="female"
-              checked={formData.gender === 'female'}
-              onChange={handleChange}
-            /> Female
+            />
+            {errors.name && <p className="error-message">{errors.name}</p>}
           </div>
-          {errors.gender && <p style={{ color: 'red' }}>{errors.gender}</p>}
-        </div>
 
-        <div style={{ marginBottom: '10px' }}>
-          <label>Assigned Café:</label>
-          <select
-            name="assignedCafe"
-            value={formData.assignedCafe}
-            onChange={handleChange}
-            style={{ width: '100%', padding: '8px', marginTop: '4px' }}
-          >
-            <option value="">Select a café (optional)</option>
-            <option value="Cafe1">Café 1</option>
-            <option value="Cafe2">Café 2</option>
-          </select>
-        </div>
+          <div className="form-group">
+            <label>Email:</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+            />
+            {errors.email && <p className="error-message">{errors.email}</p>}
+          </div>
 
-        <button type="submit" style={{ padding: '10px 15px', marginRight: '10px', backgroundColor: '#4CAF50', color: '#fff', border: 'none', borderRadius: '4px' }}>
-          Submit
-        </button>
-        <button type="button" onClick={handleCancel} style={{ padding: '10px 15px', backgroundColor: '#f44336', color: '#fff', border: 'none', borderRadius: '4px' }}>
-          Cancel
-        </button>
-      </form>
+          <div className="form-group">
+            <label>Phone Number:</label>
+            <input
+              type="text"
+              name="phoneNumber"
+              value={formData.phoneNumber}
+              onChange={handleChange}
+            />
+            {errors.phoneNumber && <p className="error-message">{errors.phoneNumber}</p>}
+          </div>
+
+          <div className="form-group">
+            <label>Gender:</label>
+            <div>
+              <input
+                type="radio"
+                name="gender"
+                value="male"
+                checked={formData.gender === 'male'}
+                onChange={handleChange}
+              /> Male
+              <input
+                type="radio"
+                name="gender"
+                value="female"
+                checked={formData.gender === 'female'}
+                onChange={handleChange}
+              /> Female
+            </div>
+            {errors.gender && <p className="error-message">{errors.gender}</p>}
+          </div>
+
+          <div className="form-group">
+            <label>Assigned Café:</label>
+            <select
+              name="assignedCafe"
+              value={formData.assignedCafe}
+              onChange={handleChange}
+            >
+              <option value="">Select a café</option>
+              <option value="Cafe1">Café 1</option>
+              <option value="Cafe2">Café 2</option>
+            </select>
+            {errors.assignedCafe && <p className="error-message">{errors.assignedCafe}</p>}
+          </div>
+
+          <button type="submit" className="button button-submit">
+            Submit
+          </button>
+          <button type="button" onClick={handleCancel} className="button button-cancel">
+            Cancel
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

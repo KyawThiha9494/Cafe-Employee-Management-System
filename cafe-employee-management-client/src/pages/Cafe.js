@@ -2,29 +2,33 @@ import React, { useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import { Button, Box, Container, Typography, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
+import { CircularProgress, Button, Box, Container, Typography, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
 import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useRouter } from '@tanstack/react-router';
+import { useCafes } from "../hooks/useCafes";
+
 
 const Cafe = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [cafeToDelete, setCafeToDelete] = useState(null);
   const [ setCafes] = useState([]);
   const [locationFilter, setLocationFilter] = useState('');
+
+  const { data: cafes, isLoading, isError } = useCafes();
   const router = useRouter();
 
   useEffect(() => {
     fetchCafes();
   }, []);
 
-  const cafes = [
+  /*const cafes = [
     {
         id: 1,
         logo: 'https://example.com/logo1.png', // Replace with actual logo URLs or paths
         name: 'Cafe Mocha',
         description: 'A cozy cafe offering a variety of coffee blends and pastries.',
-        employees: 12,
+        employees: '12',
         location: 'Downtown'
     },
     {
@@ -59,7 +63,7 @@ const Cafe = () => {
         employees: 20,
         location: 'City Center'
     }
-];
+];*/
 
 
   const fetchCafes = async () => {
@@ -74,6 +78,7 @@ const Cafe = () => {
 
   const handleEdit = (cafe) => {
     console.log('Edit cafe:', cafe);
+    router.navigate({ to: `/cafe-form/${cafe.id}` });   
   };
 
   const handleDelete = (cafeId) => {
@@ -94,7 +99,7 @@ const Cafe = () => {
 
   const handleAddNewCafe = () => {
     console.log('Add New Cafe');
-    router.navigate({ to: '/cafe-form' });
+    router.navigate({ to: '/cafe-form/create' });
   };
 
   const handleLocationFilterChange = (event) => {
@@ -102,11 +107,14 @@ const Cafe = () => {
   };
 
   const handleViewEmployees = (cafe) => {
-    // Navigate to the employees page of the selected cafe
     router.navigate({ to: `/cafes/${cafe.id}/employees` });
   };
 
-  // Filter cafes by location
+  const handleBack = () => {
+    router.navigate({ to: '/' });
+  };
+
+
   const filteredCafes = cafes.filter((cafe) => 
     locationFilter === '' || cafe.location.includes(locationFilter)
   );
@@ -118,11 +126,16 @@ const Cafe = () => {
     { 
       headerName: 'Employees', 
       field: 'employees', 
-      cellRenderer: (params) => (
-        <Button variant="contained" size="small" onClick={() => handleViewEmployees(params.data)}>
-          View Employees
-        </Button>
-      ),
+      cellRenderer: (params) => {
+        const employeeFieldValue = params.data && params.data.employees ? params.data.employees : 'No Data';
+        const employeeListUrl = `/employee`;
+
+        return (
+          <a href={employeeListUrl} target="_blank" rel="noopener noreferrer">
+            {employeeFieldValue}
+          </a>
+        );
+      }
     },
     { headerName: 'Location', field: 'location', sortable: true, filter: true },
     {
@@ -148,6 +161,9 @@ const Cafe = () => {
       ),
     },
   ];
+
+  if (isLoading) return <CircularProgress />; 
+  if (isError) return <Typography color="error">Error fetching data</Typography>;
 
   return (
     <Container>
@@ -176,7 +192,7 @@ const Cafe = () => {
         </FormControl>
       </Box>
 
-      <div className="ag-theme-alpine" style={{ height: 400, width: '100%' }}>
+      <div className="ag-theme-alpine" style={{ height: 400, width: '100%',marginBottom: '20px'}}>
         <AgGridReact
           rowData={filteredCafes}
           columnDefs={columnDefs}
@@ -184,6 +200,10 @@ const Cafe = () => {
           paginationPageSize={10}
         />
       </div>
+
+      <button type="button" onClick={handleBack} className="button button-submit">
+              ~ Back to Welcome Page
+      </button>
 
       <Dialog
         open={openDialog}
