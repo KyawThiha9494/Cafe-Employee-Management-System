@@ -35,7 +35,7 @@ To set up the project locally, follow these steps:
    npm install
    npm start
 
-Configure the database connection: Update the connection string in the appsettings.json:
+## Configure the database connection**: Update the connection string in the appsettings.json:
 
 Server=localhost;Database=CafeEmployeeDB;User=root;Password=password;
 
