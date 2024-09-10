@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter, useParams, useNavigate } from '@tanstack/react-router';
 import '../styles/CafeForm.css';
+import axios from 'axios';
 
 const CafeForm = () => {
   const {id} = useParams({ from: '/cafe-form/$id'} );
@@ -20,19 +21,20 @@ const CafeForm = () => {
 
   useEffect(() => {
     if (id !== 'create') {
-      // Fetch existing cafe data based on id
       console.log('Fetching data for cafeId:', id);
-      // Example café data fetching logic
-      const cafeData = {
-        name: 'Cafe Example',
-        description: 'A cozy place for coffee.',
-        logo: null, // Update this with actual logic if needed
-        location: 'Location Example',
+      const fetchCafes = async () => {
+        try {
+          const { data } = await axios.get(`https://localhost:7099/api/Cafes/GetCafe/${id}`);
+          console.log("Get Cafe by ID: "+ JSON.stringify(data));
+          setFormData(data);
+        } catch (error) {
+          console.error('Error fetching cafe data:', error);
+        }
       };
-      setFormData(cafeData);
+      fetchCafes();
     } else {
       console.log('No cafeId found in URL');
-      // Clear form data if no cafeId
+
       setFormData({
         name: '',
         description: '',
@@ -49,11 +51,6 @@ const CafeForm = () => {
     }
     if (!formData.description || formData.description.length > 256) {
       newErrors.description = '* Description cannot exceed 256 characters';
-    }
-    if (!formData.logo) {
-      newErrors.logo = '* Logo is required';
-    } else if (formData.logo.size > 2 * 1024 * 1024) {
-      newErrors.logo = '* Logo must be less than 2 MB';
     }
     if (!formData.location) {
       newErrors.location = '* Location is required';
@@ -72,21 +69,26 @@ const CafeForm = () => {
     setIsDirty(true);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit= async (e) => {
     e.preventDefault();
     if (validate()) {
-      console.log('Submitting form data:', formData);
-      if (id !== 'create') {
-        // Update existing café logic here
-        console.log('Updating cafe:', id);
-      } else {
-        // Add new café logic here
-        console.log('Adding new cafe');
+      try {
+        if (id === 'create') {
+          // Create a new cafe
+          console.log("Create New : "+ JSON.stringify(formData));
+          await axios.post('https://localhost:7099/api/Cafes/CreateCafe', formData);
+        } else {
+          // Update existing cafe
+          console.log("Update : "+ JSON.stringify(formData));
+          await axios.put(`https://localhost:7099/api/Cafes/UpdateCafe/${id}`, formData);
+        }
+        router.navigate({ to: `/cafe` });
+      } catch (error) {
+        console.error('Error submitting form:', error);
       }
-      setIsDirty(false);
-      router.navigate({ to: `/cafe` }); 
     }
   };
+
 
   const handleCancel = () => {
     if (isDirty && !window.confirm('You have unsaved changes. Are you sure you want to leave?')) {

@@ -1,12 +1,13 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import { AgGridReact } from "ag-grid-react";
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { CircularProgress, Button, Box, Container, Typography } from '@mui/material';
 import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import { useRouter } from '@tanstack/react-router';
+import { useRouter, useParams } from '@tanstack/react-router';
 import { useEmployees } from "../hooks/useEmployees";
+import axios from 'axios';
 
 
 const Employee = () => {
@@ -17,6 +18,37 @@ const Employee = () => {
     const { data: employees, isLoading, isError } = useEmployees();
     const router = useRouter(); 
 
+    const [apiEmployees, setApiEmployees] = useState([]); 
+    const [apiLoading, setApiLoading] = useState(false); 
+    const [apiError, setApiError] = useState(null);
+
+    const {id} = useParams({ from: '/employee/$id'} );
+
+    useEffect(() => {
+        if (id && id !== "employee-list") {
+            const fetchEmployees = async () => {
+                setApiLoading(true);
+                try {
+                    const response = await axios.get(`https://localhost:7099/api/Employee/GetEmployeeByCafeId/${id}`);
+                    setApiEmployees(response.data);
+                } catch (error) {
+                    setApiError(error);
+                } finally {
+                    setApiLoading(false);
+                }
+            };
+            fetchEmployees();
+        }
+    }, [id]);
+
+    const dataToDisplay = id !== 'employee-list' ? apiEmployees : employees;
+    const loading = id !== 'employee-list' ? apiLoading : isLoading;
+    const error = id !== 'employee-list' ? apiError : isError;
+
+    if (loading) return <CircularProgress />; 
+    if (error) return <Typography color="error">Error fetching data: {error.message}</Typography>;
+
+    //https://localhost:7099/api/Employee/GetEmployeeByCafeId/
     /*const employees = [
         {
             id: 1,
@@ -63,11 +95,17 @@ const Employee = () => {
             
     };
 
-    const handleConfirmDelete = () => {
-        console.log('Delete employee with ID:', employeeToDelete);
-        setOpenDialog(false);
+    const handleConfirmDelete = async () => {
+        try {
+            console.log('Delete employee with ID:', employeeToDelete);
+            await axios.delete(`https://localhost:7099/api/Employee/DeleteEmployee/${employeeToDelete}`);
+            setOpenDialog(false);
+            console.log(`Employee with ID: ${employeeToDelete} deleted successfully.`);
+        } catch (error) {
+            console.error('Error deleting employee:', error);
+            
+        }
     };
-
     const handleCancelDelete = () => {
         setOpenDialog(false);
         setEmployeeToDelete(null);
@@ -84,7 +122,7 @@ const Employee = () => {
         { headerName: 'Email Address', field: 'emailAddress', sortable: true, filter: true },
         { headerName: 'Phone Number', field: 'phoneNumber', sortable: true, filter: true },
         { headerName: 'Days Worked', field: 'daysWorked', sortable: true, filter: true },
-        { headerName: 'Café Name', field: 'cafe', sortable: true, filter: true },
+        { headerName: 'Café Name', field: 'cafeName', sortable: true, filter: true },
         {
             headerName: 'Actions',
             cellRenderer: (params) => (
@@ -129,7 +167,7 @@ const Employee = () => {
            
             <div className="ag-theme-alpine" style={{ height: 400, width: '100%',marginBottom: '20px'}}>
                 <AgGridReact
-                    rowData={employees}
+                    rowData={dataToDisplay}
                     columnDefs={columnDefs}
                     pagination={true}
                     paginationPageSize={10}

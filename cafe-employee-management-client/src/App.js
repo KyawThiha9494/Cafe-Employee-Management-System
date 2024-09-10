@@ -19,7 +19,7 @@ const rootRoute = createRootRoute({
 });
 
 const employee = createRoute({
-  path: 'employee',
+  path: 'employee/$id',
   component: Employee,
   getParentRoute: () => rootRoute,
 });

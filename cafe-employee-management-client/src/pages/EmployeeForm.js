@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter, useParams, useNavigate } from '@tanstack/react-router';
+import axios from 'axios';
 
 const EmployeeForm = () => {
+
+  const [cafes, setCafes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(null);
 
   const {id} = useParams({ from: '/employee-form/$id'} );
 
@@ -11,38 +16,51 @@ const EmployeeForm = () => {
   
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
+    emailAddress: '',
     phoneNumber: '',
     gender: '',
-    assignedCafe: '',
+    CafeId: '',
   });
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
+    const fetchCafes = async () => {
+      try {
+        const { data } = await axios.get('https://localhost:7099/api/Cafes/GetCafes');
+        setCafes(data);
+      } catch (error) {
+        setFetchError('Error fetching cafes data');
+      }
+    };
+
     if (id !== 'create') {
-      // Fetch employee data based on employeeId
-      console.log('Fetching data for employeeId:', id);
-      // Example employee data fetching logic
-      const employeeData = {
-        id: id,
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        phoneNumber: '123-456-7890',
-        gender: 'male',
-        assignedCafe: 'Cafe1',
+      const fetchEmployee = async () => {
+        try {
+          const { data } = await axios.get(`https://localhost:7099/api/Employee/GetEmployee/${id}`);
+          console.log("Get Employee by ID: "+ JSON.stringify(data));
+          setFormData({
+            ...data,
+            CafeId: data.cafeId,
+          });
+        } catch (error) {
+          console.error('Error fetching employee data:', error);
+        }
       };
-      setFormData(employeeData);
+      fetchEmployee();
     } else {
       console.log('No employeeId found in URL');
       // Clear form data if no employeeId
       setFormData({
         name: '',
-        email: '',
+        emailAddress: '',
         phoneNumber: '',
         gender: '',
-        assignedCafe: '',
+        CafeId: '',
+        CafeName: '',
       });
     }
+
+    fetchCafes().finally(() => setLoading(false));
   }, [id]);
 
   const validate = () => {
@@ -50,17 +68,14 @@ const EmployeeForm = () => {
     if (!formData.name || formData.name.length < 6 || formData.name.length > 10) {
       newErrors.name = '* Name must be between 6 and 10 characters';
     }
-    if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = '* Invalid email address';
+    if (!formData.emailAddress || !/\S+@\S+\.\S+/.test(formData.emailAddress)) {
+      newErrors.emailAddress = '* Invalid email address';
     }
     if (!formData.phoneNumber || !/^[89]\d{7}$/.test(formData.phoneNumber)) {
       newErrors.phoneNumber = '* Phone number must start with 8 or 9 and have 8 digits';
     }
     if (!formData.gender) {
       newErrors.gender = '* Gender is required';
-    }
-    if (!formData.assignedCafe) {
-      newErrors.assignedCafe = '* Please select a café';
     }
 
     setErrors(newErrors);
@@ -72,12 +87,23 @@ const EmployeeForm = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validate()) {
-      console.log('Submitting form data:', formData);
-      //navigate('/employee');
-      router.navigate({ to: `/employee` });   
+      try {
+        if (id === 'create') {
+          // Create a new employee
+          console.log("Create New : "+ JSON.stringify(formData));
+          await axios.post('https://localhost:7099/api/Employee/CreateEmployee', formData);
+        } else {
+          // Update existing employee
+          console.log("Update : "+ JSON.stringify(formData));
+          await axios.put(`https://localhost:7099/api/Employee/UpdateEmployee/${id}`, formData);
+        }
+        router.navigate({ to: `/employee/employee-list` });
+      } catch (error) {
+        console.error('Error submitting form:', error);
+      }
     }
   };
 
@@ -85,6 +111,9 @@ const EmployeeForm = () => {
     //navigate('/employee');
     router.navigate({ to: `/employee` });   
   };
+
+  if (loading) return <p>Loading...</p>;
+  if (fetchError) return <p>{fetchError}</p>;
 
   return (
     <div className="container">
@@ -106,11 +135,11 @@ const EmployeeForm = () => {
             <label>Email:</label>
             <input
               type="email"
-              name="email"
-              value={formData.email}
+              name="emailAddress"
+              value={formData.emailAddress}
               onChange={handleChange}
             />
-            {errors.email && <p className="error-message">{errors.email}</p>}
+              {errors.emailAddress && <p className="error-message">{errors.emailAddress}</p>}
           </div>
 
           <div className="form-group">
@@ -148,15 +177,20 @@ const EmployeeForm = () => {
           <div className="form-group">
             <label>Assigned Café:</label>
             <select
-              name="assignedCafe"
-              value={formData.assignedCafe}
+              name="CafeId"
+              value={formData.CafeId}
               onChange={handleChange}
+              disabled={id !== 'create'}
             >
               <option value="">Select a café</option>
-              <option value="Cafe1">Café 1</option>
-              <option value="Cafe2">Café 2</option>
+              {cafes.map(cafe => (
+                <option key={cafe.id} value={cafe.id}>
+                  {cafe.name}
+                </option>
+              ))}
+
             </select>
-            {errors.assignedCafe && <p className="error-message">{errors.assignedCafe}</p>}
+            {errors.CafeId && <p className="error-message">{errors.CafeId}</p>}
           </div>
 
           <button type="submit" className="button button-submit">

@@ -7,20 +7,21 @@ import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material
 import AddIcon from '@mui/icons-material/Add';
 import { useRouter } from '@tanstack/react-router';
 import { useCafes } from "../hooks/useCafes";
+import axios from 'axios';
 
 
 const Cafe = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [cafeToDelete, setCafeToDelete] = useState(null);
-  const [ setCafes] = useState([]);
+  const [cafes, setCafes] = useState([]);
   const [locationFilter, setLocationFilter] = useState('');
 
-  const { data: cafes, isLoading, isError } = useCafes();
+  const { data: fetchedCafes = [], isLoading, isError } = useCafes();
   const router = useRouter();
 
   useEffect(() => {
-    fetchCafes();
-  }, []);
+    setCafes(fetchedCafes);
+  }, [fetchedCafes]);
 
   /*const cafes = [
     {
@@ -66,15 +67,6 @@ const Cafe = () => {
 ];*/
 
 
-  const fetchCafes = async () => {
-    try {
-      const response = await fetch('/cafes'); 
-      const data = await response.json();
-      setCafes(data);
-    } catch (error) {
-      console.error('Failed to fetch cafes:', error);
-    }
-  };
 
   const handleEdit = (cafe) => {
     console.log('Edit cafe:', cafe);
@@ -87,10 +79,18 @@ const Cafe = () => {
     setOpenDialog(true);
   };
 
-  const handleConfirmDelete = () => {
-    console.log('Confirmed delete for cafe ID:', cafeToDelete);
-    setOpenDialog(false);
-  };
+  const handleConfirmDelete = async () => {
+    try {
+        console.log('Delete Cafe with ID:', cafeToDelete);
+        await axios.delete(`https://localhost:7099/api/Cafes/DeleteCafe/${cafeToDelete}`);
+        setCafes(cafes.filter(cafe => cafe.id !== cafeToDelete));
+        setOpenDialog(false);
+        console.log(`Cafe with ID: ${cafeToDelete} deleted successfully.`);
+    } catch (error) {
+        console.error('Error deleting Cafe:', error);
+        
+    }
+};
 
   const handleCancelDelete = () => {
     setOpenDialog(false);
@@ -127,8 +127,9 @@ const Cafe = () => {
       headerName: 'Employees', 
       field: 'employees', 
       cellRenderer: (params) => {
+        //console.log("Check data : ---> "+ JSON.stringify(params.data));
         const employeeFieldValue = params.data && params.data.employees ? params.data.employees : 'No Data';
-        const employeeListUrl = `/employee`;
+        const employeeListUrl = `/employee/`+  params.data.id;
 
         return (
           <a href={employeeListUrl} target="_blank" rel="noopener noreferrer">

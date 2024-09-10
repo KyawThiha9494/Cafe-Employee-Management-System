@@ -19,7 +19,7 @@ function Welcome() {
     <div style={{ textAlign: 'center', marginTop: '50px' }}>
       <h1>Welcome to the Cafe Employee Management System</h1>
       <div style={{ marginTop: '20px' }}>
-        <Link to="/employee">
+        <Link to="/employee/employee-list">
           <button style={buttonStyle}>Go to Employee Management</button>
         </Link>
         <Link to="/cafe" style={{ marginLeft: '20px' }}>
