@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\cafe-employee-management-api.props" />
+</Project>
