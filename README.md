@@ -10,32 +10,65 @@ The Cafe-Employee-Management-System is designed to streamline the management of 
 
 ### Front-End
 
-- **React.js**
-- **Tanstack Query**
-- **Tanstack Router**
-- **Ag-Grid**
-- **Material-UI**
+- **React.js**: A JavaScript library for building user interfaces.
+- **Tanstack Query**: A powerful data-fetching and state-management tool for React.
+- **Tanstack Router**: A routing library that provides flexible routing solutions.
+- **Ag-Grid**: A feature-rich data grid providing high-performance table rendering.
+- **Material-UI**: A popular React UI framework for creating responsive, modern user interfaces.
 
 ### Back-End
 
-- **.NET 6.3**
-- **Entity Framework Core 6.0.33**
-- **Swashbuckle.AspNetCore.Swagger 6.7.3**
-- **Pomelo.EntityFrameworkCore.MySql**
-- **MySQL**
-- **Workbench**
+- **.NET 6.0**: A cross-platform framework for building web applications and APIs.
+- **Entity Framework Core 6.0.33**: An object-relational mapper (ORM) for .NET that simplifies database interactions.
+- **Swashbuckle.AspNetCore.Swagger 6.7.3**: Tools for generating Swagger API documentation.
+- **Pomelo.EntityFrameworkCore.MySql**: A MySQL provider for Entity Framework Core, allowing it to interact with MySQL databases.
+- **MySQL**: An open-source relational database management system.
+- **Workbench**: A visual tool for designing, developing, and managing MySQL databases.
 
 ## Installation
 
-To set up the project locally, follow these steps:
- **Clone the repository:**
-   ```bash
-   git clone https://github.com/yourusername/cafe-employee-management-system.git
-   cd cafe-employee-management-system
-   npm install
-   npm start
+### Install Front-End Dependencies and Start the Application
 
-## Configure the database connection**: Update the connection string in the appsettings.json:
+npm install
+npm start
+
+## Configure the Database Connection
+
+Update the connection string in the `appsettings.json`:
 
 Server=localhost;Database=CafeEmployeeDB;User=root;Password=password;
+
+
+## Screenshots
+
+**Front-End
+
+![Home Page](./screenshots/HomePage.png)
+
+**Employee
+
+![Employee List](./screenshots/Employee-List.png)
+
+![Employee-List-Edit-Delete](./screenshots/Employee-List-Edit-Delete.png)
+
+![Add-Employee](./screenshots/Add-Employee.png)
+
+![Add-Employee-Validation](./screenshots/Add-Employee-Validation.png)
+
+
+** Cafe
+
+![Add-Employee-Validation](./screenshots/Cafe-Management.png)
+
+![Add-Cafe](./screenshots/Add-Cafe.png) 
+
+![Edit-Cafe](./screenshots/Edit-Cafe.png) 
+
+![Add-Cafe-Validation](./screenshots/Add-Cafe-Validation.png) 
+
+##Back-End
+
+![Cafe Swagger](./screenshots/cafe.jpeg) 
+
+![Employee Swagger](./screenshots/employee.jpeg) 
 
