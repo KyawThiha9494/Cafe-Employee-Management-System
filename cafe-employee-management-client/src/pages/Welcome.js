@@ -1,4 +1,3 @@
-// src/pages/Welcome.js
 import React from 'react';
 import { Link } from '@tanstack/react-router';
 

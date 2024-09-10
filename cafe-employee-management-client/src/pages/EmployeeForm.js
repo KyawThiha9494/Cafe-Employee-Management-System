@@ -49,7 +49,6 @@ const EmployeeForm = () => {
       fetchEmployee();
     } else {
       console.log('No employeeId found in URL');
-      // Clear form data if no employeeId
       setFormData({
         name: '',
         emailAddress: '',
@@ -92,11 +91,9 @@ const EmployeeForm = () => {
     if (validate()) {
       try {
         if (id === 'create') {
-          // Create a new employee
           console.log("Create New : "+ JSON.stringify(formData));
           await axios.post('https://localhost:7099/api/Employee/CreateEmployee', formData);
         } else {
-          // Update existing employee
           console.log("Update : "+ JSON.stringify(formData));
           await axios.put(`https://localhost:7099/api/Employee/UpdateEmployee/${id}`, formData);
         }

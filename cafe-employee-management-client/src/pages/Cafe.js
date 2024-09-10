@@ -40,30 +40,6 @@ const Cafe = () => {
         employees: 8,
         location: 'Uptown'
     },
-    {
-        id: 3,
-        logo: 'https://example.com/logo3.png',
-        name: 'Espresso Express',
-        description: 'Fast service and excellent espresso, ideal for those on the go.',
-        employees: 10,
-        location: 'Midtown'
-    },
-    {
-        id: 4,
-        logo: 'https://example.com/logo4.png',
-        name: 'Brew & Beans',
-        description: 'A hip cafe with live music and a wide selection of organic coffees.',
-        employees: 15,
-        location: 'Suburb'
-    },
-    {
-        id: 5,
-        logo: 'https://example.com/logo5.png',
-        name: 'Latte Lounge',
-        description: 'A modern cafe with a great selection of lattes and desserts.',
-        employees: 20,
-        location: 'City Center'
-    }
 ];*/
 
 

@@ -74,11 +74,9 @@ const CafeForm = () => {
     if (validate()) {
       try {
         if (id === 'create') {
-          // Create a new cafe
           console.log("Create New : "+ JSON.stringify(formData));
           await axios.post('https://localhost:7099/api/Cafes/CreateCafe', formData);
         } else {
-          // Update existing cafe
           console.log("Update : "+ JSON.stringify(formData));
           await axios.put(`https://localhost:7099/api/Cafes/UpdateCafe/${id}`, formData);
         }
