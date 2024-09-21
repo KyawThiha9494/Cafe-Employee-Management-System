@@ -38,6 +38,11 @@ Update the connection string in the `appsettings.json`:
 
 Server=localhost;Database=CafeEmployeeDB;User=root;Password=password;
 
+## DB Migration
+
+Go to To -> NuGet Package Manager -> Package Manager Console
+
+run -> Update-Database
 
 ## Screenshots
 
