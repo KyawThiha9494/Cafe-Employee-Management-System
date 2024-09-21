@@ -38,11 +38,15 @@ Update the connection string in the `appsettings.json`:
 
 Server=localhost;Database=CafeEmployeeDB;User=root;Password=password;
 
-## DB Migration
+## Database Migration
+ Using Terminal:
+  1. Open your terminal.
+  2. Navigate to your project directory.
+  3. Run : dotnet ef database update
 
-Go to To -> NuGet Package Manager -> Package Manager Console
-
-run -> Update-Database
+ Using Visual Studio:
+   1. Go to Tools > NuGet Package Manager > Package Manager Console.
+   2. Run : Update-Database
 
 ## Screenshots
 
